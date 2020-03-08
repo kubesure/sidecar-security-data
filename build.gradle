@@ -53,8 +53,8 @@ sourceSets {
 }
 
 task dataServer(type: CreateStartScripts) {
-    mainClassName = 'io.kubesure.sidecar.security.App'
-    applicationName = 'data-server'
+    mainClassName = 'io.kubesure.sidecar.security.data.App'
+    applicationName = 'sidecar-security-data'
     outputDir = new File(project.buildDir, 'tmp')
     classpath = startScripts.classpath
 }
