@@ -1,0 +1,67 @@
+plugins {
+    id 'java'
+    id 'com.google.protobuf' version '0.8.8'    
+    id 'application'
+}
+
+repositories {
+     maven { 
+        url "https://maven-central.storage-download.googleapis.com/repos/central/data/"
+    }
+    mavenLocal()
+}
+
+def grpcVersion = '1.21.0' 
+def protobufVersion = '3.8.0'
+def protocVersion = protobufVersion
+
+dependencies {
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+    compileOnly "javax.annotation:javax.annotation-api:1.2"
+    compile group: 'io.grpc', name: 'grpc-services', version: '1.21.0'
+    implementation "com.google.protobuf:protobuf-java-util:${protobufVersion}"
+    runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
+    compile group: 'org.apache.kafka', name: 'kafka_2.12', version: '2.2.0'
+    testCompile group: 'junit', name: 'junit', version: '4.12'  
+}
+
+protobuf {
+    protoc { artifact = "com.google.protobuf:protoc:${protocVersion}" }
+    plugins {
+        grpc { artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}" }
+    }
+
+    generateProtoTasks {
+        all()*.plugins { grpc {} }
+        ofSourceSet('main')
+    }
+}
+
+sourceSets {
+    main {
+        proto {
+            srcDir 'src/main/protobuf'
+        }
+        java {
+            srcDirs 'src/main/java'
+            srcDirs 'src/main/resources'
+            srcDirs 'build/generated/source/proto/main/grpc'
+            srcDirs 'build/generated/source/proto/main/java'
+        }
+    }
+}
+
+task dataServer(type: CreateStartScripts) {
+    mainClassName = 'io.kubesure.sidecar.security.App'
+    applicationName = 'data-server'
+    outputDir = new File(project.buildDir, 'tmp')
+    classpath = startScripts.classpath
+}
+
+applicationDistribution.into('bin') {
+    from(dataServer)
+    fileMode = 0755
+}
+
+mainClassName = 'io.kubesure.sidecar.security.data.App'
