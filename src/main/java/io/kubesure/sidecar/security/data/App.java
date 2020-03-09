@@ -11,6 +11,7 @@ import io.grpc.stub.StreamObserver;
 import io.kubesure.sidecar.security.data.CustomerGrpc.CustomerImplBase;
 import io.kubesure.sidecar.security.data.SidecarProtos.CustomerRequest;
 import io.kubesure.sidecar.security.data.SidecarProtos.CustomerResponse;
+import io.kubesure.sidecar.security.data.SidecarProtos.CustomerResponse.Builder;
 
 public class App {
     private static final Logger logger = Logger.getLogger(App.class.getName());
@@ -45,8 +46,24 @@ public class App {
     private class CustomerImpl extends CustomerImplBase {
         @Override
         public void getCustomer(CustomerRequest request, StreamObserver<CustomerResponse> responseObserver) {
-            super.getCustomer(request, responseObserver);
+            //super.getCustomer(request, responseObserver);
             logger.info("get Customer info");
+            logger.info("account Number " + request.getAccountNumber());
+            try {
+                //Customer customer = IgniteHelper.getCustomerByID(request.getAccountNumber());
+                Builder builder = CustomerResponse.newBuilder();
+                long cif = 12333l;
+                builder.setCIF(cif);
+                builder.setOk(true);
+                CustomerResponse response = builder.build();
+                responseObserver.onNext(response);
+                responseObserver.onCompleted();
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.info("error occured" + e.getMessage());
+                logger.severe(e.getMessage());
+                responseObserver.onCompleted();    
+            }
         }
     }
 
