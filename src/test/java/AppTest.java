@@ -1,11 +1,11 @@
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
+
+import io.kubesure.sidecar.security.data.IgniteHelper;
 
 public class AppTest {
 
     @Test
-    public void testCustomerData(){
-        assertTrue("test", true);        
+    public void testCustomerData() throws Exception{
+        IgniteHelper.getCustomerByID("1212");        
     }
 }
